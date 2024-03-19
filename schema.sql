@@ -1,0 +1,70 @@
+CREATE TABLE apartments (
+  id serial PRIMARY KEY,
+  "name" text NOT NULL,
+  "address" text NOT NULL
+);
+
+CREATE TABLE tenants (
+  id serial PRIMARY KEY,
+  "name" text NOT NULL,
+  rent numeric,
+  apartment_id int NOT NULL REFERENCES apartments(id) ON DELETE CASCADE
+);
+
+INSERT INTO apartments ("name", "address") VALUES
+  ('Horizon', '650 Seylynn Cres, Vancouver'),
+  ('Beacon', '429 Peak Point Drive, Kelowna'),
+  ('Apex', '255 13th Street, Maple Ridge'),
+  ('Royals', '1771 Lonsdale Avenue, Vancouver');
+
+INSERT INTO tenants ("name", rent, apartment_id) VALUES
+  ('John Smith', 1200.00, 1),
+  ('Emily Johnson', 1350.00, 2),
+  ('Michael Williams', 1100.00, 3),
+  ('Emma Jones', 1250.00, 1),
+  ('William Brown', 1300.00, 1),
+  ('Olivia Davis', 1400.00, 2),
+  ('James Miller', 1150.00, 3),
+  ('Ava Wilson', 1050.00, 1),
+  ('Alexander Taylor', 1225.00, 1),
+  ('Sophia Anderson', 1280.00, 2),
+  ('Daniel Thomas', 1325.00, 3),
+  ('Isabella Jackson', 1375.00, 3),
+  ('Joseph White', 1275.00, 1),
+  ('Mia Harris', 1180.00, 2),
+  ('David Martin', 1125.00, 3),
+  ('Charlotte Thompson', 1295.00, 3),
+  ('Michael Garcia', 1230.00, 1),
+  ('Madison Martinez', 1335.00, 2),
+  ('James Robinson', 1260.00, 2),
+  ('Abigail Clark', 1175.00, 4),
+  ('John Lewis', 1315.00, 1),
+  ('Elizabeth Rodriguez', 1210.00, 2),
+  ('Charles Hall', 1365.00, 3),
+  ('Avery Allen', 1145.00, 4),
+  ('Matthew Young', 1075.00, 1),
+  ('Harper Hernandez', 1245.00, 2),
+  ('Ethan King', 1085.00, 2),
+  ('Grace Wright', 1160.00, 4),
+  ('Andrew Lopez', 1385.00, 1),
+  ('Ella Hill', 1115.00, 2),
+  ('Ryan Scott', 1395.00, 2),
+  ('Sofia Green', 1195.00, 4),
+  ('Jackson Adams', 1095.00, 1),
+  ('Chloe Baker', 1345.00, 2),
+  ('John Martinez', 1205.00, 3),
+  ('Amelia Carter', 1290.00, 4),
+  ('David Flores', 1370.00, 1),
+  ('Anna Gonzales', 1285.00, 2),
+  ('Elijah Perez', 1235.00, 2),
+  ('Victoria Evans', 1185.00, 4),
+  ('Joseph Hill', 1330.00, 1),
+  ('Madison Long', 1265.00, 2),
+  ('Michael Rivera', 1110.00, 3),
+  ('Sophia Diaz', 1380.00, 4),
+  ('Liam King', 1055.00, 1),
+  ('Ava Wright', 1355.00, 2),
+  ('Benjamin Adams', 1140.00, 3),
+  ('Mia Lee', 1305.00, 1),
+  ('Jacob Wood', 1310.00, 1),
+  ('Emma Price', 1165.00, 2);

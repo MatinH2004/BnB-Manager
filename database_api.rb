@@ -18,7 +18,7 @@ class DatabasePersistence
            a.address, 
            COUNT(t.apartment_id) AS tenants 
        FROM apartments a
-       INNER JOIN tenants t ON a.id = t.apartment_id
+       LEFT JOIN tenants t ON a.id = t.apartment_id
        GROUP BY a.id, a.name, a.address
        ORDER BY a.name;
     SQL
@@ -42,10 +42,10 @@ class DatabasePersistence
            t.id AS tenant_id,
            t.name AS tenant_name,
            rent
-           FROM apartments a
-           INNER JOIN tenants t ON t.apartment_id = a.id
-           WHERE t.apartment_id = $1
-           ORDER BY tenant_name;
+      FROM apartments a
+      LEFT JOIN tenants t ON t.apartment_id = a.id
+      WHERE a.id = $1
+      ORDER BY tenant_name;
     SQL
     result = query(sql, apartment_id)
 
@@ -61,7 +61,9 @@ class DatabasePersistence
     end
   end
 
-  def add_apartment
+  def new_apartment(name, address)
+    sql = "INSERT INTO apartments (name, address) VALUES ($1, $2)"
+    query(sql, name, address)
   end
 
   def delete_apartment(id)
@@ -72,7 +74,7 @@ class DatabasePersistence
   def edit_apartment
   end
 
-  def add_tenant
+  def new_tenant
   end
 
   def delete_tenant(id)

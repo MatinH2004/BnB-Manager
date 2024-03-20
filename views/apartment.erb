@@ -1,7 +1,7 @@
 <header>
   <h2>Property: <%= @apartment[0][:apartment_name] %></h2>
   <p><b><%= @apartment[0][:apartment_address] %></b></p>
-  <a href="/login">Login</a>
+  <a href="/login">Login</a><br>
   <a href="/signup">Signup</a>
 </header>
 
@@ -13,7 +13,7 @@
     <th>Delete</th>
   </tr>
 
-  <% if @apartment.empty? %>
+  <% if no_tenants? %>
     <tr>
       <td>No Data</td>
       <td>No Data</td>
@@ -23,6 +23,7 @@
   <% end %>
 
   <% @apartment.each do |tenant| %>
+    <% break if no_tenants? %>
     <tr>
       <td><%= tenant[:tenant_name] %></td>
       <td><%= tenant[:tenant_rent] %></td>
@@ -39,5 +40,6 @@
 </table>
 
 <footer>
+  <a href="/new/<%= @apartment[0][:apartment_id] %>/tenant">New Tenant</a><br>
   <a href="/">Main Menu</a>
 </footer>

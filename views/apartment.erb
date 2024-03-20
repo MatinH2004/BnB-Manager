@@ -1,0 +1,43 @@
+<header>
+  <h2>Property: <%= @apartment[0][:apartment_name] %></h2>
+  <p><b><%= @apartment[0][:apartment_address] %></b></p>
+  <a href="/login">Login</a>
+  <a href="/signup">Signup</a>
+</header>
+
+<table>
+  <tr>
+    <th>Name</th>
+    <th>Rent</th>
+    <th>Edit</th>
+    <th>Delete</th>
+  </tr>
+
+  <% if @apartment.empty? %>
+    <tr>
+      <td>No Data</td>
+      <td>No Data</td>
+      <td>No Data</td>
+      <td>No Data</td>
+    </tr>
+  <% end %>
+
+  <% @apartment.each do |tenant| %>
+    <tr>
+      <td><%= tenant[:tenant_name] %></td>
+      <td><%= tenant[:tenant_rent] %></td>
+      <td>
+        <a href="/edit/<%= tenant[:apartment_id] %>/tenant/<%= tenant[:tenant_id] %>">Edit</a>
+      </td>
+      <td>
+        <form method="post" action="/delete/<%= tenant[:apartment_id] %>/tenant/<%= tenant[:tenant_id] %>">
+          <button type="submit">Delete</button>
+        </form>
+      </td>
+    </tr>
+  <% end %>
+</table>
+
+<footer>
+  <a href="/">Main Menu</a>
+</footer>

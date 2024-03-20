@@ -5,10 +5,57 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/style.css" type="text/css">
     <title>BnB Manager</title>
+    <style>
+      .message {
+        background-color: lightblue;
+        font-weight: bold;
+      }
+
+      table {
+        font-family: arial, sans-serif;
+        border-collapse: collapse;
+        margin-left: auto;
+        margin-right: auto;
+        width: 50%;
+      }
+
+      td, th {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+      }
+
+      tr:nth-child(even) {
+        background-color: #dddddd;
+      }
+
+      header, footer {
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 10px;
+        margin-bottom: 20px;
+        width: 50%;
+      }
+
+      .title {
+        text-align: center;
+      }
+
+      .main-menu {
+        margin-left: auto;
+        width: 50%;
+      }
+
+      .main-menu a {
+        display: inline-block;
+      }
+    </style>
   </head>
 
   <body>
-    <h1>BnB Manager</h1>
+    <div class="title">
+      <h1>BnB Manager</h1>
+    </div>
 
     <% if session[:message] %>
       <p class="message"><%= session.delete(:message) %></p>

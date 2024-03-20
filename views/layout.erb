@@ -4,11 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/style.css" type="text/css">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <title>BnB Manager</title>
     <style>
-      .message {
-        background-color: lightblue;
+      .flash-success {
+        background-color: #80ffaa;
         font-weight: bold;
+        padding: 15px;
+      }
+
+      .flash-error {
+        background-color: #ff8080;
+        color: black;
+        font-weight: bold;
+        padding: 15px;
       }
 
       table {
@@ -29,7 +38,7 @@
         background-color: #dddddd;
       }
 
-      header, footer {
+      header, footer, .middle {
         margin-left: auto;
         margin-right: auto;
         margin-top: 10px;
@@ -46,8 +55,19 @@
         width: 50%;
       }
 
-      .main-menu a {
-        display: inline-block;
+      a {
+        text-decoration: none;
+        color: black;
+      }
+
+      a:hover {
+        font-weight: bold;
+        background-color: #e6cffc;
+      }
+
+      button:hover {
+        background-color: #fa8b87;
+        border-radius: 15px;
       }
     </style>
   </head>
@@ -57,8 +77,10 @@
       <h1>BnB Manager</h1>
     </div>
 
-    <% if session[:message] %>
-      <p class="message"><%= session.delete(:message) %></p>
+    <% if session[:success] %>
+      <p class="flash-success"><%= session.delete(:success) %></p>
+    <% elsif session[:error] %>
+      <p class="flash-error"><%= session.delete(:error) %></p>
     <% end %>
 
     <%== yield %>

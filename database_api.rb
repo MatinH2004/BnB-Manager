@@ -74,12 +74,14 @@ class DatabasePersistence
   def edit_apartment
   end
 
-  def new_tenant
+  def new_tenant(name, rent, apartment_id)
+    sql = "INSERT INTO tenants (name, rent, apartment_id) VALUES ($1, $2, $3)"
+    query(sql, name, rent, apartment_id)
   end
 
-  def delete_tenant(id)
-    sql = "DELETE FROM tenants WHERE id = $1"
-    query(sql, id)
+  def delete_tenant(apartment_id, tenant_id)
+    sql = "DELETE FROM tenants WHERE id = $1 AND apartment_id = $2"
+    query(sql, tenant_id, apartment_id)
   end
 
   def edit_tenant

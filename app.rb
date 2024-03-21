@@ -31,9 +31,19 @@ def valid_input?(input, type = :str)
   when :str
     input unless input.strip.empty?
   when :num
-    # for matching decimal numbers
-    input if input.match?(/\A\d+(\.\d+)?\z/)
+    # for matching valid integers & decimal numbers
+    input if input.strip.match?(/\A\d+(\.\d+)?\z/)
   end
+end
+
+def two_decimals(num)
+  return if num.nil?
+  format("%.2f", num)
+end
+
+def capitalize_name(name)
+  return if name.nil?
+  name.split.map(&:capitalize).join(" ")
 end
 
 # data fetching methods
@@ -113,7 +123,7 @@ post "/new/apartment" do
     session[:success] = "New property added!"
     redirect "/"
   else
-    session[:error] = "Please input a valid name or address."
+    session[:error] = "Please input a valid name and/or address."
     status 422
     session[:name] = name
     session[:address] = address
@@ -122,39 +132,55 @@ post "/new/apartment" do
 end
 
 get "/new/:apartment_id/tenant" do
+  @apartment_id = params[:apartment_id]
+  session[:name], session[:rent] = '', ''
   erb :new_tenant
 end
 
-post "/new/tenant" do
+post "/new/:apartment_id/tenant" do
+  name = capitalize_name(valid_input?(params[:name]))
+  rent = two_decimals(valid_input?(params[:rent], :num))
+  apartment_id = params[:apartment_id]
 
+  if name && rent
+    @storage.new_tenant(name, rent, apartment_id)
+    session[:success] = "New tenant added!"
+    redirect "/view/#{apartment_id}"
+  else
+    session[:error] = "Please input a valid name and/or rent."
+    status 422
+    @apartment_id = apartment_id
+    session[:name] = name
+    session[:rent] = rent
+    erb :new_tenant
+  end
 end
 
 # modify apartment
 
 get "/edit/:apartment_id" do
-
 end
 
 post "/edit/:apartment_id" do
-
 end
 
 post "/delete/:apartment_id" do
-
+  apartment_id = params[:apartment_id]
+  @storage.delete_apartment(apartment_id)
 end
 
 # modify tenant
 
 get "/edit/:apartment_id/tenant/:tenant_id" do
-
 end
 
 post "/edit/:apartment_id/tenant/:tenant_id" do
-
 end
 
 post "/delete/:apartment_id/tenant/:tenant_id" do
-
+  apartment_id = params[:apartment_id]
+  tenant_id = params[:tenant_id]
+  @storage.delete_tenant()
 end
 
 after do

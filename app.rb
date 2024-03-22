@@ -20,7 +20,7 @@ end
 
 helpers do
   def no_tenants?
-    @apartment[0][:tenant_name].nil?
+    @tenants.first.values.compact.empty?
   end
 end
 
@@ -44,16 +44,6 @@ end
 def capitalize_name(name)
   return if name.nil?
   name.split.map(&:capitalize).join(" ")
-end
-
-# data fetching methods
-
-def load_apartment(id)
-  apartment = @storage.find_apartment(id)
-  return apartment if apartment
-
-  session[:error] = "The specified property was not found."
-  redirect "/"
 end
 
 # user authentication methods
@@ -87,16 +77,31 @@ end
 
 before do
   @storage = DatabasePersistence.new(logger)
+  PER_PAGE = 5
 end
 
 get "/" do
-  @apartments = @storage.all_apartments
+  @page = (params[:page] || 1).to_i
+  offset = (@page - 1) * PER_PAGE
+
+  @apartments = @storage.all_apartments(offset: offset, limit: PER_PAGE)
+  total_apartments = @storage.total_apartment_count
+  @total_pages = (total_apartments.to_f / PER_PAGE).ceil
+
   erb :home
 end
 
 get "/view/:id" do
   id = params[:id]
-  @apartment = load_apartment(id)
+  @apartment = @storage.fetch_apartment(id)
+
+  @page = (params[:page] || 1).to_i
+  offset = (@page - 1) * PER_PAGE
+
+  @tenants = @storage.all_tenants(offset: offset, limit: PER_PAGE, id: @apartment[:id])
+  total_tenants = @storage.total_tenant_count(@apartment[:id])
+  @total_pages = (total_tenants.to_f / PER_PAGE).ceil
+  # binding.pry
   erb :apartment
 end
 
@@ -157,7 +162,7 @@ get "/edit/:apartment_id" do
   session[:name], session[:address] = '', ''
 
   @id = params[:apartment_id]
-  apartment = @storage.apartment_details(@id)
+  apartment = @storage.fetch_apartment(@id)
 
   session[:name] = apartment[:name]
   session[:address] = apartment[:address]
@@ -197,7 +202,7 @@ get "/edit/:apartment_id/tenant/:tenant_id" do
   session[:name], session[:rent] = '', ''
   @tenant_id = params[:tenant_id]
   @apartment_id = params[:apartment_id]
-  tenant = @storage.tenant_details(@tenant_id)
+  tenant = @storage.fetch_tenant(@tenant_id)
 
   session[:name] = tenant[:name]
   session[:rent] = tenant[:rent]
@@ -234,6 +239,65 @@ post "/delete/:apartment_id/tenant/:tenant_id" do
   @storage.delete_tenant(apartment_id, tenant_id)
   redirect "/view/#{apartment_id}"
 end
+
+# user authentication - below routes not tested
+
+get "/users/signin" do
+  session[:username], session[:password] = '', ''
+  erb :signin
+end
+
+post "/users/signin" do
+  credentials = load_user_credentials
+  username, password = params[:username], params[:password]
+
+  if valid_credentials?(username, password)
+    session[:username] = username
+    session[:success] = "Welcome!"
+    redirect "/"
+  else
+    session[:error] = "Invalid username and/or password. Try again."
+    status 422
+    erb :signin
+  end
+end
+
+#
+
+get "/users/signup" do
+  session[:username], session[:password] = '', ''
+  erb :signup
+end
+
+post "/users/signup" do
+  credentials = load_user_credentials
+  session[:username] = params[:username]
+  password = params[:password]
+  confirm_password = params[:c_password]
+
+  if !valid_input?(session[:username])
+    session[:error] = "Username cannot be empty!"
+    status 422
+    erb :signup
+  elsif password != confirm_password
+    session[:error] = "Passwords do not match. Please confirm password!"
+    status 422
+    erb :signup
+  else
+    credentials[session[:username]] = password
+    File.open("./users.yml", "w") { |f| f.write(YAML.dump(credentials)) }
+    session[:success] = "Account created successfully!"
+    redirect "/"
+  end
+end
+
+#
+
+post "/users/signout" do
+
+end
+
+# teardown code
 
 after do
   @storage.disconnect

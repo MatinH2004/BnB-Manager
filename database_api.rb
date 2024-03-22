@@ -11,7 +11,8 @@ class DatabasePersistence
     @db.exec_params(statement, params)
   end
 
-  def all_apartments
+  # Return all apartments and its tenant count
+  def all_apartments(offset: 0, limit: 5)
     sql = <<~SQL
     SELECT a.id,
            a.name,
@@ -20,9 +21,10 @@ class DatabasePersistence
     FROM apartments a
     LEFT JOIN tenants t ON a.id = t.apartment_id
     GROUP BY a.id, a.name, a.address
-    ORDER BY a.name;
+    ORDER BY a.name
+    OFFSET $1 LIMIT $2;
     SQL
-    result = query(sql)
+    result = query(sql, offset, limit)
 
     result.map do |tuple|
       {
@@ -34,45 +36,69 @@ class DatabasePersistence
     end
   end
 
-  def find_apartment(apartment_id)
+  # Return all tenants for the specified apartment id
+  def all_tenants(offset: 0, limit: 5, id: nil)
     sql = <<~SQL
-    SELECT a.id AS apartment_id,
-           a.name AS apartment_name,
-           a.address,
-           t.id AS tenant_id,
-           t.name AS tenant_name,
-           rent
+    SELECT t.id,
+           t.name,
+           t.rent
     FROM apartments a
     LEFT JOIN tenants t ON t.apartment_id = a.id
     WHERE a.id = $1
-    ORDER BY tenant_name;
+    ORDER BY t.name
+    OFFSET $2 LIMIT $3;
     SQL
-    result = query(sql, apartment_id)
-
+  
+    result = query(sql, id, offset, limit)
     result.map do |tuple|
       {
-        apartment_id: tuple["apartment_id"],
-        apartment_name: tuple["apartment_name"],
-        apartment_address: tuple["address"],
-        tenant_id: tuple["tenant_id"],
-        tenant_name: tuple["tenant_name"],
-        tenant_rent: tuple["rent"]
+        id: tuple["id"],
+        name: tuple["name"],
+        rent: tuple["rent"]
       }
     end
   end
 
-  def apartment_details(id)
+  # Return apartment details
+  def fetch_apartment(id)
     sql = "SELECT * FROM apartments WHERE id = $1"
     result = query(sql, id)
-
+  
     result.map do |tuple|
       {
-        id: tuple[:id],
+        id: tuple["id"],
         name: tuple["name"],
         address: tuple["address"]
       }
     end.first
   end
+
+  # Return tenant details
+  def fetch_tenant(id)
+    sql = "SELECT name, rent FROM tenants WHERE id = $1"
+    result = query(sql, id)
+
+    result.map do |tuple|
+      {
+        name: tuple["name"],
+        rent: tuple["rent"]
+      }
+    end.first
+  end
+
+  def total_apartment_count
+    sql = "SELECT COUNT(id) FROM apartments"
+    result = query(sql)
+    result.first["count"].to_i
+  end
+
+  def total_tenant_count(id)
+    sql = "SELECT COUNT(id) FROM tenants WHERE apartment_id = $1"
+    result = query(sql, id)
+    result.first["count"].to_i
+  end
+
+  # Apartment modification methods
 
   def new_apartment(name, address)
     sql = "INSERT INTO apartments (name, address) VALUES ($1, $2)"
@@ -94,17 +120,7 @@ class DatabasePersistence
     result = query(sql, name, address, id)
   end
 
-  def tenant_details(id)
-    sql = "SELECT name, rent FROM tenants WHERE id = $1"
-    result = query(sql, id)
-
-    result.map do |tuple|
-      {
-        name: tuple["name"],
-        rent: tuple["rent"]
-      }
-    end.first
-  end
+  # Tenant modification methods
 
   def new_tenant(name, rent, apartment_id)
     sql = "INSERT INTO tenants (name, rent, apartment_id) VALUES ($1, $2, $3)"

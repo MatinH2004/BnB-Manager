@@ -17,10 +17,10 @@ class DatabasePersistence
            a.name,
            a.address, 
            COUNT(t.apartment_id) AS tenants 
-       FROM apartments a
-       LEFT JOIN tenants t ON a.id = t.apartment_id
-       GROUP BY a.id, a.name, a.address
-       ORDER BY a.name;
+    FROM apartments a
+    LEFT JOIN tenants t ON a.id = t.apartment_id
+    GROUP BY a.id, a.name, a.address
+    ORDER BY a.name;
     SQL
     result = query(sql)
 
@@ -42,10 +42,10 @@ class DatabasePersistence
            t.id AS tenant_id,
            t.name AS tenant_name,
            rent
-      FROM apartments a
-      LEFT JOIN tenants t ON t.apartment_id = a.id
-      WHERE a.id = $1
-      ORDER BY tenant_name;
+    FROM apartments a
+    LEFT JOIN tenants t ON t.apartment_id = a.id
+    WHERE a.id = $1
+    ORDER BY tenant_name;
     SQL
     result = query(sql, apartment_id)
 
@@ -61,6 +61,19 @@ class DatabasePersistence
     end
   end
 
+  def apartment_details(id)
+    sql = "SELECT * FROM apartments WHERE id = $1"
+    result = query(sql, id)
+
+    result.map do |tuple|
+      {
+        id: tuple[:id],
+        name: tuple["name"],
+        address: tuple["address"]
+      }
+    end.first
+  end
+
   def new_apartment(name, address)
     sql = "INSERT INTO apartments (name, address) VALUES ($1, $2)"
     query(sql, name, address)
@@ -71,7 +84,26 @@ class DatabasePersistence
     query(sql, id)
   end
 
-  def edit_apartment
+  def edit_apartment(name, address, id)
+    sql = <<~SQL
+    UPDATE apartments
+    SET "name" = $1, 
+        "address" = $2 
+    WHERE id = $3;
+    SQL
+    result = query(sql, name, address, id)
+  end
+
+  def tenant_details(id)
+    sql = "SELECT name, rent FROM tenants WHERE id = $1"
+    result = query(sql, id)
+
+    result.map do |tuple|
+      {
+        name: tuple["name"],
+        rent: tuple["rent"]
+      }
+    end.first
   end
 
   def new_tenant(name, rent, apartment_id)
@@ -84,7 +116,14 @@ class DatabasePersistence
     query(sql, tenant_id, apartment_id)
   end
 
-  def edit_tenant
+  def edit_tenant(name, rent, id)
+    sql = <<~SQL
+    UPDATE tenants
+    SET "name" = $1,
+        "rent" = $2
+    WHERE id = $3;
+    SQL
+    result = query(sql, name, rent, id)
   end
 
   def disconnect

@@ -87,7 +87,6 @@ end
 
 before do
   @storage = DatabasePersistence.new(logger)
-  # @sort_tenants = ["name", "address", "tenants"]
 end
 
 get "/" do
@@ -98,24 +97,18 @@ end
 get "/view/:id" do
   id = params[:id]
   @apartment = load_apartment(id)
-  # @tenants = @storage.load_tenants(id)
   erb :apartment
-end
-
-# misc routes
-
-post "/sort" do
-
 end
 
 # new data
 
 get "/new/apartment" do
+  session[:name], session[:address] = '', ''
   erb :new_apartment
 end
 
 post "/new/apartment" do
-  name = valid_input?(params[:name])
+  name = capitalize_name(valid_input?(params[:name]))
   address = valid_input?(params[:address])
 
   if name && address
@@ -125,6 +118,7 @@ post "/new/apartment" do
   else
     session[:error] = "Please input a valid name and/or address."
     status 422
+
     session[:name] = name
     session[:address] = address
     erb :new_apartment
@@ -132,8 +126,8 @@ post "/new/apartment" do
 end
 
 get "/new/:apartment_id/tenant" do
-  @apartment_id = params[:apartment_id]
   session[:name], session[:rent] = '', ''
+  @apartment_id = params[:apartment_id]
   erb :new_tenant
 end
 
@@ -149,6 +143,7 @@ post "/new/:apartment_id/tenant" do
   else
     session[:error] = "Please input a valid name and/or rent."
     status 422
+
     @apartment_id = apartment_id
     session[:name] = name
     session[:rent] = rent
@@ -159,28 +154,85 @@ end
 # modify apartment
 
 get "/edit/:apartment_id" do
+  session[:name], session[:address] = '', ''
+
+  @id = params[:apartment_id]
+  apartment = @storage.apartment_details(@id)
+
+  session[:name] = apartment[:name]
+  session[:address] = apartment[:address]
+
+  erb :edit_apartment
 end
 
 post "/edit/:apartment_id" do
+  apartment_id = params[:apartment_id]
+  name = valid_input?(params[:name])
+  address = valid_input?(params[:address])
+
+  if name && address
+    @storage.edit_apartment(name, address, apartment_id)
+    session[:success] = "Property details have been updated!"
+    redirect "/"
+  else
+    session[:error] = "Please input a valid name and/or address."
+    status 422
+
+    @id = apartment_id
+    session[:name] = name
+    session[:address] = address
+    erb :edit_apartment
+  end
 end
 
 post "/delete/:apartment_id" do
   apartment_id = params[:apartment_id]
   @storage.delete_apartment(apartment_id)
+  redirect "/"
 end
 
 # modify tenant
 
 get "/edit/:apartment_id/tenant/:tenant_id" do
+  session[:name], session[:rent] = '', ''
+  @tenant_id = params[:tenant_id]
+  @apartment_id = params[:apartment_id]
+  tenant = @storage.tenant_details(@tenant_id)
+
+  session[:name] = tenant[:name]
+  session[:rent] = tenant[:rent]
+
+  erb :edit_tenant
 end
 
 post "/edit/:apartment_id/tenant/:tenant_id" do
+  apartment_id = params[:apartment_id]
+  tenant_id = params[:tenant_id]
+
+  name = capitalize_name(valid_input?(params[:name]))
+  rent = two_decimals(valid_input?(params[:rent], :num))
+
+  if name && rent
+    @storage.edit_tenant(name, rent, tenant_id)
+    session[:success] = "Tenant details have been updated!"
+    redirect "/view/#{apartment_id}"
+  else
+    session[:error] = "Please input a valid name and/or address."
+    status 422
+
+    @apartment_id = apartment_id
+    @tenant_id = tenant_id
+    session[:name] = name
+    session[:rent] = rent
+    erb :edit_tenant
+  end
 end
 
 post "/delete/:apartment_id/tenant/:tenant_id" do
   apartment_id = params[:apartment_id]
   tenant_id = params[:tenant_id]
-  @storage.delete_tenant()
+  @storage.delete_tenant(apartment_id, tenant_id)
+  redirect "/view/#{apartment_id}"
 end
 
 after do

@@ -1,0 +1,14 @@
+<div class="middle">
+  <h3>Edit Property</h3>
+  <form action="/edit/<%= @id %>" method="post">
+    <label for="name">Name:</label>
+    <input type="text" id="name" name="name" value="<%= session[:name] %>"><br><br>
+    <label for="address">Address:</label>
+    <input type="text" id="address" name="address" value="<%= session[:address] %>"><br><br>
+    <button type="submit" value="Submit">Submit</button>
+  </form>
+</div>
+
+<footer>
+  <a href="/">Main Menu</a>
+</footer>

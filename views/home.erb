@@ -48,7 +48,7 @@
 </table>
 
 <footer>
-  <p><%= @page %> / <%= @total_pages %></p>
+  <p><%= @page %> / <%= (@total_pages == 0 ? 1 : @total_pages) %></p>
 
   <% if @total_pages > 1 %>
     <div class="pagination">

@@ -24,6 +24,8 @@ helpers do
   end
 end
 
+PER_PAGE = 5 
+
 # input validation methods
 
 def valid_input?(input, type = :str)
@@ -46,6 +48,14 @@ def capitalize_name(name)
   name.split.map(&:capitalize).join(" ")
 end
 
+# session handling methods
+
+def clear_session_values(*keys)
+  keys.each do |key|
+    session[key] = nil
+  end
+end
+
 # user authentication methods
 
 def load_user_credentials
@@ -66,8 +76,8 @@ end
 
 def require_signed_in_user
   unless session[:username]
-    session[:error] = "You must be signed in to do that."
-    redirect "/"
+    session[:error] = "You must sign in first."
+    redirect "/users/signin"
   end
 end
 
@@ -77,14 +87,18 @@ end
 
 before do
   @storage = DatabasePersistence.new(logger)
-  PER_PAGE = 5
 end
 
 get "/" do
+  require_signed_in_user
+
   @page = (params[:page] || 1).to_i
   offset = (@page - 1) * PER_PAGE
 
   @apartments = @storage.all_apartments(offset: offset, limit: PER_PAGE)
+
+  redirect "/error" unless @apartments
+
   total_apartments = @storage.total_apartment_count
   @total_pages = (total_apartments.to_f / PER_PAGE).ceil
 
@@ -95,20 +109,27 @@ get "/view/:id" do
   id = params[:id]
   @apartment = @storage.fetch_apartment(id)
 
+  redirect "/error" unless @apartment
+
   @page = (params[:page] || 1).to_i
   offset = (@page - 1) * PER_PAGE
 
   @tenants = @storage.all_tenants(offset: offset, limit: PER_PAGE, id: @apartment[:id])
   total_tenants = @storage.total_tenant_count(@apartment[:id])
   @total_pages = (total_tenants.to_f / PER_PAGE).ceil
-  # binding.pry
+
   erb :apartment
+end
+
+get "/error" do
+  session[:error] = "404 Not Found - Please make sure the URL is valid"
+  erb :not_found
 end
 
 # new data
 
 get "/new/apartment" do
-  session[:name], session[:address] = '', ''
+  clear_session_values(:name, :address)
   erb :new_apartment
 end
 
@@ -121,7 +142,7 @@ post "/new/apartment" do
     session[:success] = "New property added!"
     redirect "/"
   else
-    session[:error] = "Please input a valid name and/or address."
+    session[:error] = "Please input a valid name and address."
     status 422
 
     session[:name] = name
@@ -131,8 +152,13 @@ post "/new/apartment" do
 end
 
 get "/new/:apartment_id/tenant" do
-  session[:name], session[:rent] = '', ''
-  @apartment_id = params[:apartment_id]
+  clear_session_values(:name, :rent)
+  apartment = @storage.fetch_apartment(params[:apartment_id])
+  
+  redirect "/error" unless apartment
+  
+  @apartment_id = apartment[:id]
+
   erb :new_tenant
 end
 
@@ -146,7 +172,7 @@ post "/new/:apartment_id/tenant" do
     session[:success] = "New tenant added!"
     redirect "/view/#{apartment_id}"
   else
-    session[:error] = "Please input a valid name and/or rent."
+    session[:error] = "Please input a valid name and rent."
     status 422
 
     @apartment_id = apartment_id
@@ -159,10 +185,12 @@ end
 # modify apartment
 
 get "/edit/:apartment_id" do
-  session[:name], session[:address] = '', ''
+  clear_session_values(:name, :address)
 
   @id = params[:apartment_id]
   apartment = @storage.fetch_apartment(@id)
+
+  redirect "/error" unless apartment
 
   session[:name] = apartment[:name]
   session[:address] = apartment[:address]
@@ -180,7 +208,7 @@ post "/edit/:apartment_id" do
     session[:success] = "Property details have been updated!"
     redirect "/"
   else
-    session[:error] = "Please input a valid name and/or address."
+    session[:error] = "Please input a valid name and address."
     status 422
 
     @id = apartment_id
@@ -193,16 +221,20 @@ end
 post "/delete/:apartment_id" do
   apartment_id = params[:apartment_id]
   @storage.delete_apartment(apartment_id)
+
+  session[:success] = "Property deleted successfully!"
   redirect "/"
 end
 
 # modify tenant
 
 get "/edit/:apartment_id/tenant/:tenant_id" do
-  session[:name], session[:rent] = '', ''
+  clear_session_values(:name, :rent)
   @tenant_id = params[:tenant_id]
   @apartment_id = params[:apartment_id]
-  tenant = @storage.fetch_tenant(@tenant_id)
+  tenant = @storage.fetch_tenant(@tenant_id, @apartment_id)
+
+  redirect "/error" unless tenant
 
   session[:name] = tenant[:name]
   session[:rent] = tenant[:rent]
@@ -222,7 +254,7 @@ post "/edit/:apartment_id/tenant/:tenant_id" do
     session[:success] = "Tenant details have been updated!"
     redirect "/view/#{apartment_id}"
   else
-    session[:error] = "Please input a valid name and/or address."
+    session[:error] = "Please input a valid name and rent."
     status 422
 
     @apartment_id = apartment_id
@@ -237,13 +269,15 @@ post "/delete/:apartment_id/tenant/:tenant_id" do
   apartment_id = params[:apartment_id]
   tenant_id = params[:tenant_id]
   @storage.delete_tenant(apartment_id, tenant_id)
+
+  session[:success] = "Tenant deleted successfuly!"
   redirect "/view/#{apartment_id}"
 end
 
 # user authentication - below routes not tested
 
 get "/users/signin" do
-  session[:username], session[:password] = '', ''
+  clear_session_values(:username, :password)
   erb :signin
 end
 
@@ -256,7 +290,7 @@ post "/users/signin" do
     session[:success] = "Welcome!"
     redirect "/"
   else
-    session[:error] = "Invalid username and/or password. Try again."
+    session[:error] = "Invalid username or password. Try again."
     status 422
     erb :signin
   end
@@ -265,7 +299,7 @@ end
 #
 
 get "/users/signup" do
-  session[:username], session[:password] = '', ''
+  clear_session_values(:username, :password)
   erb :signup
 end
 

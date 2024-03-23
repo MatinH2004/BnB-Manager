@@ -74,9 +74,9 @@ class DatabasePersistence
   end
 
   # Return tenant details
-  def fetch_tenant(id)
-    sql = "SELECT name, rent FROM tenants WHERE id = $1"
-    result = query(sql, id)
+  def fetch_tenant(id, apartment_id)
+    sql = "SELECT name, rent FROM tenants WHERE id = $1 AND apartment_id = $2"
+    result = query(sql, id, apartment_id)
 
     result.map do |tuple|
       {
@@ -141,6 +141,8 @@ class DatabasePersistence
     SQL
     result = query(sql, name, rent, id)
   end
+
+  # Teardown code
 
   def disconnect
     @db.close

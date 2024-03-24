@@ -1,0 +1,17 @@
+<div class="middle">
+  <h2><i>Effortless Property Management, Simplified for You!</i></h2>
+  <h3>Sign Up</h3>
+  <form action="/users/signup" method="post">
+    <label for="username">Username:</label>
+    <input type="text" id="username" name="username" value="<%= session[:username_input] %>"><br><br>
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="password" value="<%= session[:password] %>"><br><br>
+    <label for="c_password">Confirm Password:</label>
+    <input type="password" id="c_password" name="c_password" value="<%= session[:c_password] %>"><br><br>
+    <button type="submit" value="Submit">Submit</button>
+  </form>
+</div>
+
+<footer>
+  <a href="/users/signin">Sign In</a>
+</footer>

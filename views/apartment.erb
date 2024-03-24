@@ -1,8 +1,10 @@
 <header>
   <h2>Property: <%= @apartment[:name] %></h2>
   <p><b><%= @apartment[:address] %></b></p>
-  <a href="/login">Login</a><br>
-  <a href="/signup">Signup</a><br><br>
+  <p>User: <%= session[:username] %></p>
+  <form action="/users/signout" method="post">
+    <button type="submit">Sign Out</button><br><br>
+  </form>
 
   <a href="/new/<%= @apartment[:id] %>/tenant">New Tenant</a><br>
 </header>
@@ -29,7 +31,7 @@
         </td>
         <td>
           <form method="post" action="/delete/<%= @apartment[:id] %>/tenant/<%= tenant[:id] %>">
-            <button type="submit">Delete</button>
+            <button class="delete" type="submit">Delete</button>
           </form>
         </td>
       </tr>

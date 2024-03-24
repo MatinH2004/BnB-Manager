@@ -22,25 +22,25 @@
     <tr>
       <td colspan="6">No Data</td>
     </tr>
-  <% end %>
-
-  <% @apartments.each do |apartment| %>
-    <tr>
-      <td><%= apartment[:name] %></td>
-      <td><%= apartment[:address] %></td>
-      <td><%= apartment[:tenants] %></td>
-      <td>
-        <a href="/view/<%= apartment[:id] %>">View</a>
-      </td>
-      <td>
-        <a href="/edit/<%= apartment[:id] %>">Edit</a>
-      </td>
-      <td>
-        <form method="post" action="/delete/<%= apartment[:id] %>">
-          <button class="delete" type="submit">Delete</button>
-        </form>
-      </td>
-    </tr>
+  <% else %>
+    <% @apartments.each do |apartment| %>
+      <tr>
+        <td><%= apartment[:name] %></td>
+        <td><%= apartment[:address] %></td>
+        <td><%= apartment[:tenants] %></td>
+        <td>
+          <a href="/view/<%= apartment[:id] %>">View</a>
+        </td>
+        <td>
+          <a href="/edit/<%= apartment[:id] %>">Edit</a>
+        </td>
+        <td>
+          <form method="post" action="/delete/<%= apartment[:id] %>">
+            <button class="delete" type="submit">Delete</button>
+          </form>
+        </td>
+      </tr>
+    <% end %>
   <% end %>
 </table>
 

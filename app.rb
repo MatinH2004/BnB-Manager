@@ -302,7 +302,7 @@ get "/users/signin" do
 end
 
 post "/users/signin" do
-  username = valid_input?(params[:username])
+  username = valid_input?(params[:username], :usern)
   password = valid_input?(params[:password])
 
   if valid_credentials?(username, password)

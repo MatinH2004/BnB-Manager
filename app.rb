@@ -24,7 +24,7 @@ helpers do
   end
 end
 
-PER_PAGE = 5 
+PER_PAGE = 5
 
 # input validation methods
 
@@ -46,6 +46,11 @@ end
 def capitalize_name(name)
   return if name.nil?
   name.split.map(&:capitalize).join(" ")
+end
+
+def calc_total_pages(total_rows, per_page = PER_PAGE)
+  sum = (total_rows.to_f / PER_PAGE).ceil
+  sum == 0 ? 1 : sum
 end
 
 # session handling methods
@@ -76,7 +81,7 @@ end
 
 def require_signed_in_user
   unless session[:username]
-    session[:error] = "You must sign in first."
+    session[:error] = "Please sign in."
     redirect "/users/signin"
   end
 end
@@ -97,10 +102,10 @@ get "/" do
 
   @apartments = @storage.all_apartments(offset: offset, limit: PER_PAGE)
 
-  redirect "/error" unless @apartments
-
   total_apartments = @storage.total_apartment_count
-  @total_pages = (total_apartments.to_f / PER_PAGE).ceil
+  @total_pages = calc_total_pages(total_apartments)
+
+  redirect "/error" unless @page <= @total_pages
 
   erb :home
 end
@@ -116,7 +121,9 @@ get "/view/:id" do
 
   @tenants = @storage.all_tenants(offset: offset, limit: PER_PAGE, id: @apartment[:id])
   total_tenants = @storage.total_tenant_count(@apartment[:id])
-  @total_pages = (total_tenants.to_f / PER_PAGE).ceil
+  @total_pages = calc_total_pages(total_tenants)
+
+  redirect "/error" unless @page <= @total_pages
 
   erb :apartment
 end
@@ -274,29 +281,31 @@ post "/delete/:apartment_id/tenant/:tenant_id" do
   redirect "/view/#{apartment_id}"
 end
 
-# user authentication - below routes not tested
+# user sign in
 
 get "/users/signin" do
-  clear_session_values(:username, :password)
+  clear_session_values(:username_input, :password)
   erb :signin
 end
 
 post "/users/signin" do
-  credentials = load_user_credentials
-  username, password = params[:username], params[:password]
+  username = valid_input?(params[:username])
+  password = valid_input?(params[:password])
 
   if valid_credentials?(username, password)
     session[:username] = username
-    session[:success] = "Welcome!"
+    session[:success] = "Welcome #{username}!"
     redirect "/"
   else
     session[:error] = "Invalid username or password. Try again."
     status 422
+
+    session[:username_input] = username
     erb :signin
   end
 end
 
-#
+# user sign up
 
 get "/users/signup" do
   clear_session_values(:username, :password)
@@ -325,10 +334,12 @@ post "/users/signup" do
   end
 end
 
-#
+# user sign out
 
 post "/users/signout" do
-
+  session.delete(:username)
+  session[:success] = "You have been signed out."
+  redirect "/users/signin"
 end
 
 # teardown code

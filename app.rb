@@ -35,6 +35,9 @@ def valid_input?(input, type = :str)
   when :num
     # for matching valid integers & decimal numbers
     input if input.strip.match?(/\A\d+(\.\d+)?\z/)
+  when :usern
+    # match for letters and numbers (no spaces)
+    input if input.match?(/\A[a-zA-Z0-9]+\z/)
   end
 end
 
@@ -308,27 +311,31 @@ end
 # user sign up
 
 get "/users/signup" do
-  clear_session_values(:username, :password)
+  clear_session_values(:username_input, :password)
   erb :signup
 end
 
 post "/users/signup" do
   credentials = load_user_credentials
-  session[:username] = params[:username]
-  password = params[:password]
+  username = valid_input?(params[:username], :usern)
+  password = valid_input?(params[:password])
   confirm_password = params[:c_password]
 
-  if !valid_input?(session[:username])
-    session[:error] = "Username cannot be empty!"
+  if !username
+    session[:error] = "Username should only contain letter and numbers!"
     status 422
     erb :signup
   elsif password != confirm_password
     session[:error] = "Passwords do not match. Please confirm password!"
     status 422
+
+    session[:username_input] = username
     erb :signup
   else
-    credentials[session[:username]] = password
+    credentials[username] = password
     File.open("./users.yml", "w") { |f| f.write(YAML.dump(credentials)) }
+
+    session[:username] = username
     session[:success] = "Account created successfully!"
     redirect "/"
   end

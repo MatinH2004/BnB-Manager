@@ -18,11 +18,15 @@ configure(:development) do
   also_reload("database_api.rb")
 end
 
+# Helper methods
+
 helpers do
   def no_tenants?
     @tenants.first.values.compact.empty?
   end
 end
+
+# Number of rows shown (pagination)
 
 PER_PAGE = 5
 
@@ -83,14 +87,10 @@ def valid_credentials?(username, password)
 end
 
 def require_signed_in_user
-  unless session[:username]
+  unless session.key?(:username)
     session[:error] = "Please sign in."
     redirect "/users/signin"
   end
-end
-
-def user_signed_in?
-  session.key?(:username)
 end
 
 before do
@@ -114,6 +114,8 @@ get "/" do
 end
 
 get "/view/:id" do
+  require_signed_in_user
+
   id = params[:id]
   @apartment = @storage.fetch_apartment(id)
 
@@ -139,6 +141,8 @@ end
 # new data
 
 get "/new/apartment" do
+  require_signed_in_user
+
   clear_session_values(:name, :address)
   erb :new_apartment
 end
@@ -162,6 +166,8 @@ post "/new/apartment" do
 end
 
 get "/new/:apartment_id/tenant" do
+  require_signed_in_user
+
   clear_session_values(:name, :rent)
   apartment = @storage.fetch_apartment(params[:apartment_id])
   
@@ -195,6 +201,8 @@ end
 # modify apartment
 
 get "/edit/:apartment_id" do
+  require_signed_in_user
+
   clear_session_values(:name, :address)
 
   @id = params[:apartment_id]
@@ -239,6 +247,8 @@ end
 # modify tenant
 
 get "/edit/:apartment_id/tenant/:tenant_id" do
+  require_signed_in_user
+
   clear_session_values(:name, :rent)
   @tenant_id = params[:tenant_id]
   @apartment_id = params[:apartment_id]

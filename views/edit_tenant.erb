@@ -1,4 +1,4 @@
-<div class="middle">
+<main>
   <h3>Edit Tenant</h3>
   <form action="/edit/<%= @apartment_id %>/tenant/<%= @tenant_id %>" method="post">
     <label for="name">Name:</label>
@@ -7,7 +7,7 @@
     <input type="text" id="rent" name="rent" value="<%= session[:rent] %>"><br><br>
     <button type="submit" value="Submit">Submit</button>
   </form>
-</div>
+</main>
 
 <footer>
   <a href="/view/<%= @apartment_id %>">Go Back</a>

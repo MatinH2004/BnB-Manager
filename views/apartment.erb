@@ -1,4 +1,4 @@
-<header>
+<main>
   <h2>Property: <%= @apartment[:name] %></h2>
   <p><b><%= @apartment[:address] %></b></p>
   <p>User: <%= session[:username] %></p>
@@ -7,7 +7,7 @@
   </form>
 
   <a href="/new/<%= @apartment[:id] %>/tenant">New Tenant</a><br>
-</header>
+</main>
 
 <table>
   <tr>

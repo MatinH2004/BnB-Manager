@@ -1,0 +1,76 @@
+header, footer, main {
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 10px;
+  margin-bottom: 20px;
+  width: 50%;
+}
+
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  width: 50%;
+}
+
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+tr:nth-child(even) {
+  background-color: #dddddd;
+}
+
+.title {
+  text-align: center;
+}
+
+.main-menu {
+  margin-left: auto;
+  width: 50%;
+}
+
+#not-found {
+  text-align: center;
+  border-style: solid;
+  padding: 25px;
+  margin-top: 5rem;
+}
+
+.flash-success {
+  background-color: #80ffaa;
+  font-weight: bold;
+  padding: 15px;
+  text-align: center;
+}
+
+.flash-error {
+  background-color: #ff8080;
+  color: black;
+  font-weight: bold;
+  padding: 15px;
+  text-align: center;
+}
+
+a {
+  text-decoration: none;
+  color: black;
+}
+
+a:hover {
+  font-weight: bold;
+  background-color: #e6cffc;
+}
+
+button:hover {
+  background-color: #e6cffc;
+  border-radius: 15px;
+}
+
+.delete:hover {
+  background-color: #fa8b87;
+  border-radius: 15px;
+}

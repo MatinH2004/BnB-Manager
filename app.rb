@@ -79,7 +79,7 @@ def valid_credentials?(username, password)
   credentials = load_user_credentials
 
   if credentials.key?(username)
-    bcrypt_password = BCrypt::Password.create(credentials[username])
+    bcrypt_password = BCrypt::Password.new(credentials[username])
     bcrypt_password == password
   else
     false
@@ -89,6 +89,7 @@ end
 def require_signed_in_user
   unless session.key?(:username)
     session[:error] = "Please sign in."
+    session[:requested_path] = request.path_info
     redirect "/users/signin"
   end
 end
@@ -308,7 +309,11 @@ post "/users/signin" do
   if valid_credentials?(username, password)
     session[:username] = username
     session[:success] = "Welcome #{username}!"
-    redirect "/"
+    if session[:requested_path]
+      redirect session.delete(:requested_path)
+    else
+      redirect "/"
+    end
   else
     session[:error] = "Invalid username or password. Try again."
     status 422
@@ -342,7 +347,8 @@ post "/users/signup" do
     session[:username_input] = username
     erb :signup
   else
-    credentials[username] = password
+    hashed_password = BCrypt::Password.create(password)
+    credentials[username] = hashed_password.to_s
     File.open("./users.yml", "w") { |f| f.write(YAML.dump(credentials)) }
 
     session[:username] = username

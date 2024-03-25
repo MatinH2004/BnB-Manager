@@ -88,4 +88,5 @@ INSERT INTO tenants ("name", rent, apartment_id) VALUES
   ('Nick Perry', 1800.00, 7),
   ('Rachele Lang', 1900.00, 7),
   ('Dylan Spyer', 2000.00, 7),
-  ('Patrick Moran', 2400.00, 7);
+  ('Patrick Moran', 2400.00, 7),
+  ('Pete Handsome', 2125.89, 7);

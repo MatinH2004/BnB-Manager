@@ -102,8 +102,10 @@ get "/" do
   require_signed_in_user
 
   @page = (params[:page] || 1).to_i
-  offset = (@page - 1) * PER_PAGE
 
+  redirect "/error" unless @page > 0
+
+  offset = (@page - 1) * PER_PAGE
   @apartments = @storage.all_apartments(offset: offset, limit: PER_PAGE)
 
   total_apartments = @storage.total_apartment_count
@@ -119,13 +121,13 @@ get "/view/:id" do
 
   id = params[:id]
   @apartment = @storage.fetch_apartment(id)
-
-  redirect "/error" unless @apartment
-
   @page = (params[:page] || 1).to_i
-  offset = (@page - 1) * PER_PAGE
 
+  redirect "/error" unless @apartment && (@page > 0)
+  
+  offset = (@page - 1) * PER_PAGE
   @tenants = @storage.all_tenants(offset: offset, limit: PER_PAGE, id: @apartment[:id])
+  
   total_tenants = @storage.total_tenant_count(@apartment[:id])
   @total_pages = calc_total_pages(total_tenants)
 

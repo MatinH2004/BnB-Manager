@@ -136,6 +136,7 @@ end
 
 get "/error" do
   session[:error] = "404 Not Found - Please make sure the URL is valid"
+  status 404
   erb :not_found
 end
 

@@ -15,7 +15,10 @@ INSERT INTO apartments ("name", "address") VALUES
   ('Horizon', '650 Seylynn Cres, Vancouver'),
   ('Beacon', '429 Peak Point Drive, Kelowna'),
   ('Apex', '255 13th Street, Maple Ridge'),
-  ('Royals', '1771 Lonsdale Avenue, Vancouver');
+  ('Royals', '1771 Lonsdale Avenue, Vancouver'),
+  ('Dunder Mifflin', '1725 Slough Ave, Scranton'),
+  ('Anthem', '123 17th Street, Port Alberni'),
+  ('Launch School HQ', '1929 Scottsdale, Arizona');
 
 INSERT INTO tenants ("name", rent, apartment_id) VALUES
   ('John Smith', 1200.00, 1),
@@ -67,4 +70,22 @@ INSERT INTO tenants ("name", rent, apartment_id) VALUES
   ('Benjamin Adams', 1140.00, 3),
   ('Mia Lee', 1305.00, 1),
   ('Jacob Wood', 1310.00, 1),
-  ('Emma Price', 1165.00, 2);
+  ('Emma Price', 1165.00, 2),
+  ('Michael Scott', 1965.00, 5),
+  ('Dwight Schrute', 2500.00, 5),
+  ('Pam Beesly', 1300.00, 5),
+  ('Jim Halpert', 1650.00, 5),
+  ('Andy Bernard', 1900.00, 5),
+  ('Kevin Malone', 1679.25, 5),
+  ('Creed Bratton', 900.00, 5),
+  ('Angela Martin', 1200.00, 5),
+  ('Oscar Martinez', 500.00, 5),
+  ('Kelly Kapoor', 1100.00, 5),
+  ('Chris Lee', 5000.00, 7),
+  ('Brandi Seeley', 2100.00, 7),
+  ('Clare MacAdie', 1989.99, 7),
+  ('Victor Paolo Reyes', 2180.25, 7),
+  ('Nick Perry', 1800.00, 7),
+  ('Rachele Lang', 1900.00, 7),
+  ('Dylan Spyer', 2000.00, 7),
+  ('Patrick Moran', 2400.00, 7);

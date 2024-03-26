@@ -68,6 +68,8 @@ developer: letmein
   - I achieved this using session values.
   - For example, in the `post "/new/apartment"` route, my `valid_input?` validator returns the string object passed in if it's valid, or returns `nil` otherwise. Then I assign these values to `session[:name]` and `session[:address]`, which are present in the `value` attribute of the `<input>` elements. So, if the data is valid, it is shown in the input box, if the data is not valid, the session value references `nil`, which is not displayed in the input box.
 
+- All HTML is escaped, and all SQL queries are called with the `#exec_params` method.
+
 ### User Authentication
 - The app requires sign in authentication for all operations.
   - This is achieved through the use of `require_signed_in_user` method, called in the primary `get` routes.

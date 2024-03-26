@@ -1,6 +1,6 @@
 <main>
   <h2>Property: <%= @apartment[:name] %></h2>
-  <p><b><%= @apartment[:address] %></b></p>
+  <h3><%= @apartment[:address] %></h3>
   <p>User: <%= session[:username] %></p>
   <form action="/users/signout" method="post">
     <button type="submit">Sign Out</button><br><br>
@@ -40,6 +40,7 @@
 </table>
 
 <footer>
+  <h3>Monthly Revenue: <%= two_decimals(revenue(@apartment[:id])) %></h3>
   <p><%= @page %> / <%= (@total_pages == 0 ? 1 : @total_pages) %></p>
 
   <% if @total_pages > 1 %>

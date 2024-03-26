@@ -23,6 +23,15 @@ helpers do
   def no_tenants?
     @tenants.first.values.compact.empty?
   end
+
+  def revenue(apartment_id)
+    @storage.monthly_revenue(apartment_id)
+  end
+
+  def two_decimals(num)
+    return if num.nil?
+    format("%.2f", num)
+  end
 end
 
 # Number of rows shown (pagination)
@@ -42,11 +51,6 @@ def valid_input?(input, type = :str)
     # match for letters and numbers (no spaces)
     input if input.match?(/\A[a-zA-Z0-9]+\z/)
   end
-end
-
-def two_decimals(num)
-  return if num.nil?
-  format("%.2f", num)
 end
 
 def capitalize_name(name)

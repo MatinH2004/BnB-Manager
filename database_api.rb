@@ -98,6 +98,12 @@ class DatabasePersistence
     result.first["count"].to_i
   end
 
+  def monthly_revenue(id)
+    sql = "SELECT SUM(rent) FROM tenants WHERE apartment_id = $1"
+    result = query(sql, id)
+    result.first["sum"].to_i
+  end
+
   # Apartment modification methods
 
   def new_apartment(name, address)

@@ -371,6 +371,12 @@ post "/users/signout" do
   redirect "/users/signin"
 end
 
+# catch-all route for invalid get requests
+
+get '/*' do
+  redirect '/error'
+end
+
 # teardown code
 
 after do

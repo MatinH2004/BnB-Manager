@@ -3,7 +3,6 @@ require "tilt/erubis"
 
 require "yaml"
 require "bcrypt"
-require "pry"
 
 require_relative "database_api"
 

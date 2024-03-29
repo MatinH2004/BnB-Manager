@@ -59,7 +59,7 @@ def capitalize_name(name)
 end
 
 def calc_total_pages(total_rows, per_page = PER_PAGE)
-  sum = (total_rows.to_f / PER_PAGE).ceil
+  sum = (total_rows.to_f / per_page).ceil
   sum == 0 ? 1 : sum
 end
 

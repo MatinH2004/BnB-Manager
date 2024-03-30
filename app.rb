@@ -244,6 +244,8 @@ post "/edit/:apartment_id" do
 end
 
 post "/delete/:apartment_id" do
+  require_signed_in_user
+
   apartment_id = params[:apartment_id]
   @storage.delete_apartment(apartment_id)
 
@@ -293,6 +295,8 @@ post "/edit/:apartment_id/tenant/:tenant_id" do
 end
 
 post "/delete/:apartment_id/tenant/:tenant_id" do
+  require_signed_in_user
+
   apartment_id = params[:apartment_id]
   tenant_id = params[:tenant_id]
   @storage.delete_tenant(apartment_id, tenant_id)

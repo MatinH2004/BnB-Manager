@@ -26,7 +26,7 @@ Gems:
 - pg (1.5.6, 1.5.5)
 - bundler (2.4.21, 2.4.15, 1.12.5)
 
-1. To get started, install the applications's dependancies:
+1. To get started, make sure the `require "bundler/setup"` is at the top of `app.rb` file to set up the Ruby environment and load the necessary gems. Then run the following code to install the applications's dependancies:
 ```bash
 bundle install
 ```
@@ -42,7 +42,7 @@ psql -d bnb_manager < schema.sql
 
 4. When ready, run the following to start the application and it should be available on `http://localhost:4567`.
 ```bash
-ruby app.rb
+bundle exec ruby app.rb
 ```
 
 5. When you open the page, you will be prompted to sign in or sign up for an account. Feel free to use the following user credential to sign in:
@@ -86,3 +86,13 @@ developer: letmein
   - If a user enters an URL for a page without signing in first, the sign in page is displayed, and the requested url is saved into `session[:request_path]`, by calling `path_info` on the `request` object. Upon successful authentication, the app redirects the user to the path in `session[:request_path]` or to `"/"` if no path is present. (`app.rb`, line 313)
 
 - Authentication passwords are encrypted using the `BCrypt` gem. As you can see in the `post "/users/signup"` route, a hashed password is generated (`app.rb`, line 351), and user data is saved into the `users.yml` yaml file.
+
+## Revisions
+
+### App Configuration
+"There's a lacking detail in the configuration of your app or the instruction for running of your app"
+  - The configuration detail missing was `require "bundler/setup"` missing at the top of `app.rb`, which sets up the enviroment for Ruby and properly loads the required gems. Since this is defined now, we must run the app using `bundle exec ruby app.rb`.
+
+### Require Signed In User
+"I was able to delete a property without being logged in with `curl -X POST -iv -d "" 'http://localhost:4567/delete/3'`"
+  - I fixed this issue by adding `required_signed_in_user` to the POST routes that delete data. Other POST routes won't need this, because they need to validate user input before modifying data, so logged out users won't be able to make a POST request with `curl`.

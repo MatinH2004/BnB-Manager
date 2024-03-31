@@ -95,4 +95,4 @@ developer: letmein
 
 ### Require Signed In User
 "I was able to delete a property without being logged in with `curl -X POST -iv -d "" 'http://localhost:4567/delete/3'`"
-  - I fixed this issue by adding `required_signed_in_user` to the POST routes that delete data. Other POST routes won't need this, because they need to validate user input before modifying data, so logged out users won't be able to make a POST request with `curl`.
+  - I fixed this issue by adding `required_signed_in_user` to all the POST routes, since users need to be signed in for all operations.

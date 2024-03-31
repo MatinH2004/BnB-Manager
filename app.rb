@@ -157,6 +157,8 @@ get "/new/apartment" do
 end
 
 post "/new/apartment" do
+  require_signed_in_user
+  
   name = capitalize_name(valid_input?(params[:name]))
   address = valid_input?(params[:address])
 
@@ -188,6 +190,8 @@ get "/new/:apartment_id/tenant" do
 end
 
 post "/new/:apartment_id/tenant" do
+  require_signed_in_user
+
   name = capitalize_name(valid_input?(params[:name]))
   rent = two_decimals(valid_input?(params[:rent], :num))
   apartment_id = params[:apartment_id]
@@ -226,6 +230,8 @@ get "/edit/:apartment_id" do
 end
 
 post "/edit/:apartment_id" do
+  require_signed_in_user
+
   apartment_id = params[:apartment_id]
   name = valid_input?(params[:name])
   address = valid_input?(params[:address])
@@ -274,6 +280,8 @@ get "/edit/:apartment_id/tenant/:tenant_id" do
 end
 
 post "/edit/:apartment_id/tenant/:tenant_id" do
+  require_signed_in_user
+
   apartment_id = params[:apartment_id]
   tenant_id = params[:tenant_id]
 
